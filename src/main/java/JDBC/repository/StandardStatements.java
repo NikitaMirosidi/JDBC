@@ -1,8 +1,7 @@
-package JDBC.repository.modelRepos;
+package JDBC.repository;
 
 import JDBC.model.BaseModel;
-import JDBC.repository.DatabaseConnection;
-import JDBC.repository.modelRepos.BaseRepository;
+import JDBC.config.DatabaseConnection;
 import JDBC.util.PropertiesLoader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -12,14 +11,12 @@ import javax.persistence.Entity;
 import java.io.Closeable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class BaseStatements<V extends BaseModel> implements BaseRepository<V>, Closeable {
+public class StandardStatements<V extends BaseModel> implements BaseRepository<V>, Closeable {
 
     private final Connection CONNECTION;
     private final Class<V> MODEL_CLASS;
@@ -36,7 +33,7 @@ public abstract class BaseStatements<V extends BaseModel> implements BaseReposit
     private PreparedStatement deleteStatement;
 
     @SneakyThrows
-    public BaseStatements(Class<V> modelClass) {
+    public StandardStatements(Class<V> modelClass) {
 
         this.CONNECTION = DatabaseConnection.getInstance().getConnection();
         this.MODEL_CLASS = modelClass;
@@ -62,17 +59,24 @@ public abstract class BaseStatements<V extends BaseModel> implements BaseReposit
         this.deleteStatement = CONNECTION.prepareStatement("DELETE FROM " + SCHEME_NAME + "." + TABLE_NAME + " WHERE id = ?");
     }
 
-    @SneakyThrows
     @Override
-    public void save(V model) {
+    public void save(V model) throws SQLException{
 
-        executeStatement(postStatement, model);
+        try {
+            executeStatement(postStatement, model);
+        }
+        catch (NoSuchFieldException | IllegalAccessException c) {
+            c.printStackTrace();
+        }
     }
 
+    @SneakyThrows
     @Override
     public void saveAll(Iterable<V> models) {
 
-        models.forEach(this::save);
+        for (V model : models) {
+            save(model);
+        }
     }
 
     @SneakyThrows
@@ -96,16 +100,20 @@ public abstract class BaseStatements<V extends BaseModel> implements BaseReposit
         return parse(getAllStatement.executeQuery());
     }
 
-    @SneakyThrows
+
     @Override
-    public void update(V model) {
-        putStatement.setObject(COLUMN_TO_FIELD_WITHOUT_ID.size() + 1, model.getId());
-        executeStatement(putStatement, model);
+    public void update(V model) throws SQLException {
+        try {
+            putStatement.setObject(COLUMN_TO_FIELD_WITHOUT_ID.size() + 1, model.getId());
+            executeStatement(putStatement, model);
+        }
+        catch (NoSuchFieldException | IllegalAccessException c) {
+            c.printStackTrace();
+        }
     }
 
-    @SneakyThrows
     @Override
-    public void deleteById(int id) {
+    public void deleteById(int id) throws SQLException{
 
         deleteStatement.setObject(1, id);
         deleteStatement.executeUpdate();
@@ -128,8 +136,8 @@ public abstract class BaseStatements<V extends BaseModel> implements BaseReposit
         return result;
     }
 
-    @SneakyThrows
-    private void executeStatement(PreparedStatement statement, V model) {
+
+    private void executeStatement(PreparedStatement statement, V model) throws NoSuchFieldException, SQLException, IllegalAccessException {
 
         int count = 1;
 
@@ -141,6 +149,7 @@ public abstract class BaseStatements<V extends BaseModel> implements BaseReposit
 
         statement.executeUpdate();
     }
+
 
     @SneakyThrows
     @Override

@@ -1,4 +1,4 @@
-package JDBC.repository;
+package JDBC.config;
 
 import JDBC.util.PropertiesLoader;
 import lombok.SneakyThrows;

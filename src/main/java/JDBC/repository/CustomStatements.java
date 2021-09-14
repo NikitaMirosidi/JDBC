@@ -1,10 +1,10 @@
 package JDBC.repository;
 
+import JDBC.config.DatabaseConnection;
 import JDBC.model.Developers;
 import lombok.SneakyThrows;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -40,7 +40,7 @@ public class CustomStatements implements Closeable {
     }
 
     @SneakyThrows
-    public List<Developers> getProjectsDevs(String projectName) {//список разрабов определенного проекта
+    public List<Developers> getDevsByProject(String projectName) {//список разрабов определенного проекта
 
         String sql = "SELECT * " +
                 "FROM homework_3.developers " +
