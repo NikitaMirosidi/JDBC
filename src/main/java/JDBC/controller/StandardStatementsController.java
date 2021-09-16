@@ -6,10 +6,11 @@ import JDBC.util.ModelCreator;
 import lombok.SneakyThrows;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class StandardStatementsController<V extends BaseModel> implements BaseController {
+public class StandardStatementsController<V extends BaseModel> implements BaseController<BaseModel> {
 
     private final BaseRepository REPOSITORY;
     private final Class<V> MODEL_CLASS;
@@ -38,22 +39,28 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
                     "0 - возврат в предыдущее меню\n");
 
             String i = SCANNER.next();
+            BaseModel model;
+            int id;
 
             switch (i) {
                 case "1":
-                    save();
+                    model = ModelCreator.create(MODEL_CLASS.getSimpleName(), SCANNER);
+                    save(model);
                     break;
                 case "2":
-                    get();
+                    id = ModelCreator.getInt(SCANNER, "ID", "ID указан");
+                    System.out.println(get(id).get());
                     break;
                 case "3":
-                    getAll();
+                    System.out.println(getAll());
                     break;
                 case "4":
-                    update();
+                    model = ModelCreator.create(MODEL_CLASS.getSimpleName(), SCANNER);
+                    update(model);
                     break;
                 case "5":
-                    delete();
+                    id = ModelCreator.getInt(SCANNER, "ID", "ID указан");
+                    delete(id);
                     break;
                 case "0":
                     a = false;
@@ -68,10 +75,10 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
 
     @SneakyThrows
     @Override
-    public void save() {
+    public void save(BaseModel model) {
 
         try {
-            REPOSITORY.save(ModelCreator.create(MODEL_CLASS.getSimpleName(), SCANNER));
+            REPOSITORY.save(model);
             System.out.println("Сохранено.");
         }
         catch (SQLException e) {
@@ -85,47 +92,49 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
 
     @SneakyThrows
     @Override
-    public void get() {
+    public Optional<BaseModel> get(int id) {
 
-        Optional response = REPOSITORY.getById(ModelCreator.getInt(SCANNER, "ID", "ID указан"));
+        Optional<BaseModel> response = REPOSITORY.getById(id);
 
-        if(response.isPresent()) {
-            System.out.println(response.get());
-        }
-        else {
+        if(response.isEmpty()) {
             System.out.println("В базе отсутствует запись с таким ID.");
+        }
+
+        return response;
+    }
+
+    @SneakyThrows
+    @Override
+    public List<BaseModel> getAll() {
+        return REPOSITORY.getAll();
+    }
+
+    @SneakyThrows
+    @Override
+    public void update(BaseModel model) {
+
+        if(get(model.getId()).isPresent()) {
+            try {
+                REPOSITORY.update(model);
+                System.out.println("Обновлено.");
+            }
+            catch (SQLException e) {
+                System.out.println("В базе отсутствует запись с таким ID.");
+            }
         }
     }
 
     @SneakyThrows
     @Override
-    public void getAll() {
-        System.out.println(REPOSITORY.getAll());
-    }
+    public void delete(int id) {
 
-    @SneakyThrows
-    @Override
-    public void update() {
-
-        try {
-            REPOSITORY.update(ModelCreator.create(MODEL_CLASS.getSimpleName(), SCANNER));
-            System.out.println("Обновлено.");
-        }
-        catch (SQLException e) {
-            System.out.println("В базе отсутствует запись с таким ID.");
-        }
-    }
-
-    @SneakyThrows
-    @Override
-    public void delete() {
-
-        try {
-            REPOSITORY.deleteById(ModelCreator.getInt(SCANNER, "ID", "ID указан"));
-            System.out.println("Удалено.");
-        }
-        catch (SQLException e) {
-            System.out.println("В базе отсутствует запись с таким ID.");
+        if(get(id).isPresent()) {
+            try {
+                REPOSITORY.deleteById(id);
+                System.out.println("Удалено.");
+            } catch (SQLException e) {
+                System.out.println("В базе отсутствует запись с таким ID.");
+            }
         }
     }
 }

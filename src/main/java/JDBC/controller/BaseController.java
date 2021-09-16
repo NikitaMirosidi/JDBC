@@ -1,18 +1,22 @@
 package JDBC.controller;
 
-import java.sql.SQLException;
+import JDBC.model.BaseModel;
 
-public interface BaseController {
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+public interface BaseController<T extends BaseModel> {
 
     void general();
 
-    void save();
+    void save(T model);
 
-    void get() throws SQLException;
+    Optional<T> get(int id) throws SQLException;
 
-    void getAll() throws SQLException;
+    List<T> getAll() throws SQLException;
 
-    void update() throws SQLException, NoSuchFieldException, IllegalAccessException;
+    void update(T model) throws SQLException, NoSuchFieldException, IllegalAccessException;
 
-    void delete() throws SQLException;
+    void delete(int id) throws SQLException;
 }

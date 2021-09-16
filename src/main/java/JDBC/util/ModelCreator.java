@@ -4,6 +4,7 @@ import JDBC.model.*;
 import lombok.SneakyThrows;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ModelCreator {
 
@@ -128,8 +129,7 @@ public class ModelCreator {
 
         int cost = getInt(scanner, "стоимость", "стоимость указана");
 
-        System.out.print("Укажите дату старта проекта в формате год-месяц-день: ");
-        String creationDate = scanner.next();
+        String creationDate = getCorrectTime(scanner);
 
         int customerId = getInt(scanner, "ID владельца", "ID указан");
         int companyId =  getInt(scanner, "ID исполнителя", "ID указан");
@@ -182,5 +182,71 @@ public class ModelCreator {
         }
 
         return id;
+    }
+
+    private static String getCorrectTime (Scanner scanner) {
+
+        boolean a = true;
+        String[] date;
+        int errorCounter;
+        String correctDate = "";
+
+        while(a) {
+
+            System.out.print("Укажите дату старта проекта в формате год-месяц-день цифрами: ");
+            date = scanner.next().split("-");
+            errorCounter = 0;
+
+            if(date.length != 3) {
+                System.out.println("Дата указана неверно!\nНе соблюден формат.");
+                continue;
+            }
+
+            try {
+                int year = Integer.parseInt(date[0]);
+
+                if(year < 1 || year > 9999) {
+                    System.out.println("Год указан неверно!\nЗначение выходит за допустимые пределы (1 <= год <= 9999).");
+                    errorCounter++;
+                }
+            }
+            catch (NumberFormatException e) {
+                System.out.println("Год указан неверно!\nИспользуйте цифры для указания года.");
+                errorCounter++;
+            }
+
+            try {
+                int month = Integer.parseInt(date[1]);
+
+                if(month < 1 || month > 12) {
+                    System.out.println("Месяц указан неверно!\nЗначение выходит за допустимые пределы (1 <= месяц <= 12).");
+                    errorCounter++;
+                }
+            }
+            catch (NumberFormatException e) {
+                System.out.println("Месяц указан неверно!\nИспользуйте цифры для указания месяца.");
+                errorCounter++;
+            }
+
+            try {
+                int day = Integer.parseInt(date[2]);
+
+                if(day < 1 || day > 31) {
+                    System.out.println("День указан неверно!\nЗначение выходит за допустимые пределы (1 <= день <= 31).");
+                    errorCounter++;
+                }
+            }
+            catch (NumberFormatException e) {
+                System.out.println("День указан неверно!\nИспользуйте цифры для указания дня.");
+                errorCounter++;
+            }
+
+            if (errorCounter == 0) {
+                correctDate = String.join("-", date);
+                a = false;
+            }
+        }
+
+        return correctDate;
     }
 }
