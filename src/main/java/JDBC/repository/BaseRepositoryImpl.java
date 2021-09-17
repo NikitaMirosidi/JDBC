@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class StandardStatements<V extends BaseModel> implements BaseRepository<V>, Closeable {
+public class BaseRepositoryImpl<V extends BaseModel> implements BaseRepository<V>, Closeable {
 
     private final Connection CONNECTION;
     private final Class<V> MODEL_CLASS;
@@ -33,7 +33,7 @@ public class StandardStatements<V extends BaseModel> implements BaseRepository<V
     private PreparedStatement deleteStatement;
 
     @SneakyThrows
-    public StandardStatements(Class<V> modelClass) {
+    public BaseRepositoryImpl(Class<V> modelClass) {
 
         this.CONNECTION = DatabaseConnection.getInstance().getConnection();
         this.MODEL_CLASS = modelClass;

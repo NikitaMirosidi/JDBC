@@ -15,7 +15,7 @@ create table developers (
 	id int not null auto_increment,
     `name` varchar(45) not null,
     age int not null,
-    sex varchar(45) not null,
+    gender varchar(45) not null,
     email varchar(45) not null,
     salary int not null,
     company_id int not null,

@@ -23,26 +23,26 @@ public class MainController {
                     "6 - нестандартные запросы\n" +
                     "0 - завершение приложения\n");
 
-            String i = scanner.next();
+            String i = scanner.nextLine();
 
             switch (i) {
                 case "1":
-                    new StandardStatementsController<>(Companies.class, RepositoryCreator.of(Companies.class),scanner).general();
+                    new BaseRepositoryController<>(Companies.class, RepositoryCreator.of(Companies.class),scanner).general();
                     break;
                 case "2":
-                    new StandardStatementsController<>(Customers.class, RepositoryCreator.of(Customers.class),scanner).general();
+                    new BaseRepositoryController<>(Customers.class, RepositoryCreator.of(Customers.class),scanner).general();
                     break;
                 case "3":
-                    new StandardStatementsController<>(Developers.class, RepositoryCreator.of(Developers.class),scanner).general();
+                    new BaseRepositoryController<>(Developers.class, RepositoryCreator.of(Developers.class),scanner).general();
                     break;
                 case "4":
-                    new StandardStatementsController<>(Projects.class, RepositoryCreator.of(Projects.class),scanner).general();
+                    new BaseRepositoryController<>(Projects.class, RepositoryCreator.of(Projects.class),scanner).general();
                     break;
                 case "5":
-                    new StandardStatementsController<>(Skills.class, RepositoryCreator.of(Skills.class),scanner).general();
+                    new BaseRepositoryController<>(Skills.class, RepositoryCreator.of(Skills.class),scanner).general();
                     break;
                 case "6":
-                    new CustomStatementsController().general(RepositoryCreator.of(), scanner);
+                    new CustomRepositoryController().general(RepositoryCreator.of(), scanner);
                     break;
                 case "0":
                     a = false;

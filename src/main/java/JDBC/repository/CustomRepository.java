@@ -2,6 +2,7 @@ package JDBC.repository;
 
 import JDBC.config.DatabaseConnection;
 import JDBC.model.Developers;
+import JDBC.util.PropertiesLoader;
 import lombok.SneakyThrows;
 
 import java.io.Closeable;
@@ -11,26 +12,28 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomStatements implements Closeable {
+public class CustomRepository implements Closeable {
 
     private final Connection CONNECTION;
+    private final String SCHEME_NAME;
 
-    public CustomStatements() {
+    public CustomRepository() {
         this.CONNECTION = DatabaseConnection.getInstance().getConnection();
+        this.SCHEME_NAME = PropertiesLoader.getProperty("schemeName");
     }
 
     @SneakyThrows
     public int getProjectsDevsSalary(String projectName) { //зарплата (сумма) всех разработчиков отдельного проекта
 
-        String sql = "SELECT SUM(homework_3.developers.salary) " +
-                "FROM homework_3.developers " +
-                "WHERE homework_3.developers.id IN (" +
-                    "SELECT homework_3.dev_and_projects.developer_id " +
-                    "FROM homework_3.dev_and_projects " +
-                    "WHERE homework_3.dev_and_projects.project_id = (" +
-                        "SELECT homework_3.projects.id " +
-                        "FROM homework_3.projects " +
-                        "WHERE homework_3.projects.name = '" + projectName + "'))";
+        String sql = "SELECT SUM(" + SCHEME_NAME + ".developers.salary) " +
+                "FROM " + SCHEME_NAME + ".developers " +
+                "WHERE " + SCHEME_NAME + ".developers.id IN (" +
+                    "SELECT " + SCHEME_NAME + ".dev_and_projects.developer_id " +
+                    "FROM " + SCHEME_NAME + ".dev_and_projects " +
+                    "WHERE " + SCHEME_NAME + ".dev_and_projects.project_id = (" +
+                        "SELECT " + SCHEME_NAME + ".projects.id " +
+                        "FROM " + SCHEME_NAME + ".projects " +
+                        "WHERE " + SCHEME_NAME + ".projects.name = '" + projectName + "'))";
 
         Statement statement = CONNECTION.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
@@ -43,14 +46,14 @@ public class CustomStatements implements Closeable {
     public List<Developers> getDevsByProject(String projectName) {//список разрабов определенного проекта
 
         String sql = "SELECT * " +
-                "FROM homework_3.developers " +
-                "WHERE homework_3.developers.id IN (" +
-                    "SELECT homework_3.dev_and_projects.developer_id " +
-                    "FROM homework_3.dev_and_projects " +
-                    "WHERE homework_3.dev_and_projects.project_id = (" +
-                        "SELECT homework_3.projects.id " +
-                        "FROM homework_3.projects " +
-                        "WHERE homework_3.projects.name = '" + projectName + "'))";
+                "FROM " + SCHEME_NAME + ".developers " +
+                "WHERE " + SCHEME_NAME + ".developers.id IN (" +
+                    "SELECT " + SCHEME_NAME + ".dev_and_projects.developer_id " +
+                    "FROM " + SCHEME_NAME + ".dev_and_projects " +
+                    "WHERE " + SCHEME_NAME + ".dev_and_projects.project_id = (" +
+                        "SELECT " + SCHEME_NAME + ".projects.id " +
+                        "FROM " + SCHEME_NAME + ".projects " +
+                        "WHERE " + SCHEME_NAME + ".projects.name = '" + projectName + "'))";
 
         Statement statement = CONNECTION.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
@@ -68,14 +71,14 @@ public class CustomStatements implements Closeable {
     public List<Developers> getDevsByLanguage(String languageName) {//список всех разрабов определенного языка
 
         String sql = "SELECT * " +
-                "FROM homework_3.developers " +
-                "WHERE homework_3.developers.id IN (" +
-                    "SELECT homework_3.dev_and_skills.developer_id " +
-                    "FROM homework_3.dev_and_skills " +
-                    "WHERE homework_3.dev_and_skills.skill_id IN (" +
-                        "SELECT homework_3.skills.id " +
-                        "FROM homework_3.skills " +
-                        "WHERE homework_3.skills.name = '" + languageName + "'))";
+                "FROM " + SCHEME_NAME + ".developers " +
+                "WHERE " + SCHEME_NAME + ".developers.id IN (" +
+                    "SELECT " + SCHEME_NAME + ".dev_and_skills.developer_id " +
+                    "FROM " + SCHEME_NAME + ".dev_and_skills " +
+                    "WHERE " + SCHEME_NAME + ".dev_and_skills.skill_id IN (" +
+                        "SELECT " + SCHEME_NAME + ".skills.id " +
+                        "FROM " + SCHEME_NAME + ".skills " +
+                        "WHERE " + SCHEME_NAME + ".skills.name = '" + languageName + "'))";
 
         Statement statement = CONNECTION.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
@@ -93,14 +96,14 @@ public class CustomStatements implements Closeable {
     public List<Developers> getDevsByLevel(String levelName) {//список всех разрабов определенного уровня
 
         String sql = "SELECT * " +
-                "FROM homework_3.developers " +
-                "WHERE homework_3.developers.id IN (" +
-                    "SELECT homework_3.dev_and_skills.developer_id " +
-                    "FROM homework_3.dev_and_skills " +
-                    "WHERE homework_3.dev_and_skills.skill_id IN (" +
-                        "SELECT homework_3.skills.id " +
-                        "FROM homework_3.skills " +
-                        "WHERE homework_3.skills.level = '" + levelName + "'))";
+                "FROM " + SCHEME_NAME + ".developers " +
+                "WHERE " + SCHEME_NAME + ".developers.id IN (" +
+                    "SELECT " + SCHEME_NAME + ".dev_and_skills.developer_id " +
+                    "FROM " + SCHEME_NAME + ".dev_and_skills " +
+                    "WHERE " + SCHEME_NAME + ".dev_and_skills.skill_id IN (" +
+                        "SELECT " + SCHEME_NAME + ".skills.id " +
+                        "FROM " + SCHEME_NAME + ".skills " +
+                        "WHERE " + SCHEME_NAME + ".skills.level = '" + levelName + "'))";
 
         Statement statement = CONNECTION.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
@@ -118,14 +121,14 @@ public class CustomStatements implements Closeable {
     public List<String> getProjects() {//список проектов в формате: "дата создания - название проекта - количество разработчиков на этом проекте"
 
         String sql = "SELECT " +
-                "homework_3.projects.creation_date, " +
-                "homework_3.projects.name, " +
+                SCHEME_NAME + ".projects.creation_date, " +
+                SCHEME_NAME + ".projects.name, " +
                 "COUNT(*) AS number_of_developers " +
                 "FROM " +
-                "homework_3.projects, " +
-                "homework_3.dev_and_projects " +
-                "WHERE homework_3.dev_and_projects.project_id = homework_3.projects.id " +
-                "GROUP BY homework_3.dev_and_projects.project_id";
+                SCHEME_NAME + ".projects, " +
+                SCHEME_NAME + ".dev_and_projects " +
+                "WHERE " + SCHEME_NAME + ".dev_and_projects.project_id = " + SCHEME_NAME + ".projects.id " +
+                "GROUP BY " + SCHEME_NAME + ".dev_and_projects.project_id";
 
         Statement statement = CONNECTION.createStatement();
         ResultSet resultSet = statement.executeQuery(sql);
@@ -157,7 +160,7 @@ public class CustomStatements implements Closeable {
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
                 .age(resultSet.getInt("age"))
-                .sex(resultSet.getString("sex"))
+                .gender(resultSet.getString("sex"))
                 .email(resultSet.getString("email"))
                 .salary(resultSet.getInt("salary"))
                 .companyId(resultSet.getInt("company_id"))

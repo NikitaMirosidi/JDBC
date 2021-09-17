@@ -3,20 +3,23 @@ package JDBC.controller;
 import JDBC.model.*;
 import JDBC.repository.BaseRepository;
 import JDBC.util.ModelCreator;
+import JDBC.util.ModelCreatorUtil;
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import lombok.SneakyThrows;
 
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class StandardStatementsController<V extends BaseModel> implements BaseController<BaseModel> {
+public class BaseRepositoryController<V extends BaseModel> implements BaseController<BaseModel> {
 
-    private final BaseRepository REPOSITORY;
+    private final BaseRepository<BaseModel> REPOSITORY;
     private final Class<V> MODEL_CLASS;
     private final Scanner SCANNER;
 
-    public StandardStatementsController(Class<V> modelClass, BaseRepository repository, Scanner scanner) {
+    public BaseRepositoryController(Class<V> modelClass, BaseRepository repository, Scanner scanner) {
         this.MODEL_CLASS = modelClass;
         this.SCANNER = scanner;
         this.REPOSITORY = repository;
@@ -38,34 +41,48 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
                     "5 - удалить\n" +
                     "0 - возврат в предыдущее меню\n");
 
-            String i = SCANNER.next();
+            String i = SCANNER.nextLine();
             BaseModel model;
             int id;
 
             switch (i) {
                 case "1":
-                    model = ModelCreator.create(MODEL_CLASS.getSimpleName(), SCANNER);
+
+                    model = ModelCreator.create(MODEL_CLASS, SCANNER);
                     save(model);
                     break;
                 case "2":
-                    id = ModelCreator.getInt(SCANNER, "ID", "ID указан");
-                    System.out.println(get(id).get());
+
+                    id = ModelCreatorUtil.getInt("ID",SCANNER);
+                    Optional<BaseModel> opt = get(id);
+
+                    if(opt.isEmpty()) {
+                        System.out.println("В базе отсутствует запись с таким ID.");
+                    }
+                    else {
+                        System.out.println(opt.get());
+                    }
                     break;
                 case "3":
+
                     System.out.println(getAll());
                     break;
                 case "4":
-                    model = ModelCreator.create(MODEL_CLASS.getSimpleName(), SCANNER);
+
+                    model = ModelCreator.create(MODEL_CLASS, SCANNER);
                     update(model);
                     break;
                 case "5":
-                    id = ModelCreator.getInt(SCANNER, "ID", "ID указан");
+
+                    id = ModelCreatorUtil.getInt("ID",SCANNER);
                     delete(id);
                     break;
                 case "0":
+
                     a = false;
                     break;
                 default:
+
                     System.out.println("Поддерживаемая функция не выбрана\n" +
                             "Попробуйте еще раз\n");
                     break;
@@ -77,30 +94,27 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
     @Override
     public void save(BaseModel model) {
 
-        try {
-            REPOSITORY.save(model);
-            System.out.println("Сохранено.");
-        }
-        catch (SQLException e) {
-            System.out.println("В базе уже имеется подобная запись.");
-
-            if (MODEL_CLASS.getSimpleName().equals("Projects")) {
-                System.out.println("Или указанный ID владельца/ID исполнителя отсутствует в базе.");
+            try {
+                REPOSITORY.save(model);
+                System.out.println("Сохранено.");
             }
-        }
+            catch (MysqlDataTruncation ex) {
+                System.out.println("Дата указана неверно.");
+            }
+            catch (SQLIntegrityConstraintViolationException e) {
+                System.out.println("В базе уже есть запись с таким именем.");
+
+                if(MODEL_CLASS.getSimpleName().equals("Projects")) {
+                    System.out.println("Или указанный ID владельца/ID исполнителя отсутствует в базе.");
+                }
+            }
     }
 
     @SneakyThrows
     @Override
     public Optional<BaseModel> get(int id) {
 
-        Optional<BaseModel> response = REPOSITORY.getById(id);
-
-        if(response.isEmpty()) {
-            System.out.println("В базе отсутствует запись с таким ID.");
-        }
-
-        return response;
+        return REPOSITORY.getById(id);
     }
 
     @SneakyThrows
@@ -114,13 +128,12 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
     public void update(BaseModel model) {
 
         if(get(model.getId()).isPresent()) {
-            try {
-                REPOSITORY.update(model);
-                System.out.println("Обновлено.");
-            }
-            catch (SQLException e) {
-                System.out.println("В базе отсутствует запись с таким ID.");
-            }
+
+            REPOSITORY.update(model);
+            System.out.println("Обновлено.");
+        }
+        else {
+            System.out.println("В базе отсутствует запись с таким ID.");
         }
     }
 
@@ -129,12 +142,12 @@ public class StandardStatementsController<V extends BaseModel> implements BaseCo
     public void delete(int id) {
 
         if(get(id).isPresent()) {
-            try {
-                REPOSITORY.deleteById(id);
-                System.out.println("Удалено.");
-            } catch (SQLException e) {
-                System.out.println("В базе отсутствует запись с таким ID.");
-            }
+
+            REPOSITORY.deleteById(id);
+            System.out.println("Удалено.");
+        }
+        else {
+            System.out.println("В базе отсутствует запись с таким ID.");
         }
     }
 }

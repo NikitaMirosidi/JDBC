@@ -10,10 +10,11 @@ values
 insert into customers (id, `name`, owner_name)
 values
 	(1,'BMW','Gustav Otto'),
+    (2, 'Tesla Motors', 'Elon Reeve Musk'),
 	(3,'The Walt Disney Company','Walter Elias Disney'),
 	(4,'Virgin Galactic','Richard Charles Nicholas Branson'),
 	(5,'Stark Industries','Anthony Edward Stark');
-insert into developers (id, `name`, age, sex, email, salary, company_id)
+insert into developers (id, `name`, age, gender, email, salary, company_id)
 values
 	(1,'Developer 1',25,'male','developer_1@mail.com',1000,1),
     (2,'Developer 2',43,'female','developer_2@mail.com',2000,1),

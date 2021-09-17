@@ -28,8 +28,8 @@ public class Developers implements BaseModel {
     @Column(name = "age")
     private int age;
 
-    @Column(name = "sex")
-    private String sex;
+    @Column(name = "gender")
+    private String gender;
 
     @Column(name = "email")
     private String email;

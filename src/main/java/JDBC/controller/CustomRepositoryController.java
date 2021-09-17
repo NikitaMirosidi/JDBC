@@ -1,12 +1,12 @@
 package JDBC.controller;
 
-import JDBC.repository.CustomStatements;
+import JDBC.repository.CustomRepository;
 
 import java.util.Scanner;
 
-public class CustomStatementsController {
+public class CustomRepositoryController {
 
-    public void general(CustomStatements repository, Scanner scanner) {
+    public void general(CustomRepository repository, Scanner scanner) {
 
         boolean a = true;
         StringBuilder builder = new StringBuilder();
@@ -21,30 +21,30 @@ public class CustomStatementsController {
                     "5 - получить список проектов в формате: дата создания - название проекта - количество разработчиков на этом проекте\n" +
                     "0 - возврат в предыдущее меню\n");
 
-            String i = scanner.next();
+            String i = scanner.nextLine();
 
             switch (i) {
                 case "1":
                     System.out.print("Укажите название проекта: ");
-                    builder.append(scanner.next());
+                    builder.append(scanner.nextLine());
                     System.out.println(repository.getProjectsDevsSalary(builder.toString()) + "$");
                     builder.setLength(0);
                     break;
                 case "2":
                     System.out.print("Укажите название проекта: ");
-                    builder.append(scanner.next());
+                    builder.append(scanner.nextLine());
                     System.out.println(repository.getDevsByProject(builder.toString()));
                     builder.setLength(0);
                     break;
                 case "3":
                     System.out.print("Укажите название языка: ");
-                    builder.append(scanner.next());
+                    builder.append(scanner.nextLine());
                     System.out.println(repository.getDevsByLanguage(builder.toString()));
                     builder.setLength(0);
                     break;
                 case "4":
                     System.out.print("Укажите название уровня: ");
-                    builder.append(scanner.next());
+                    builder.append(scanner.nextLine());
                     System.out.println(repository.getDevsByLevel(builder.toString()));
                     builder.setLength(0);
                     break;
