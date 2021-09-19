@@ -1,7 +1,6 @@
 package JDBC.controller;
 
-import JDBC.model.*;
-import JDBC.repository.RepositoryCreator;
+import JDBC.controller.handler.UserChoiceHandler;
 
 import java.util.Scanner;
 
@@ -11,6 +10,7 @@ public class MainController {
 
         boolean a = true;
         Scanner scanner = new Scanner(System.in);
+        UserChoiceHandler handler = UserChoiceHandler.of();
 
         while (a) {
 
@@ -23,36 +23,8 @@ public class MainController {
                     "6 - нестандартные запросы\n" +
                     "0 - завершение приложения\n");
 
-            String i = scanner.nextLine();
-
-            switch (i) {
-                case "1":
-                    new BaseRepositoryController<>(Companies.class, scanner).general();
-                    break;
-                case "2":
-                    new BaseRepositoryController<>(Customers.class,scanner).general();
-                    break;
-                case "3":
-                    new BaseRepositoryController<>(Developers.class,scanner).general();
-                    break;
-                case "4":
-                    new BaseRepositoryController<>(Projects.class,scanner).general();
-                    break;
-                case "5":
-                    new BaseRepositoryController<>(Skills.class,scanner).general();
-                    break;
-                case "6":
-                    new CustomRepositoryController().general(RepositoryCreator.of(), scanner);
-                    break;
-                case "0":
-                    a = false;
-                    System.out.println("До скорых встреч\n");
-                    break;
-                default:
-                    System.out.println("Поддерживаемая функция не выбрана\n" +
-                            "Попробуйте еще раз\n");
-                    break;
-            }
+            String choice = scanner.nextLine();
+            a = handler.handle(choice, scanner);
         }
 
         scanner.close();
