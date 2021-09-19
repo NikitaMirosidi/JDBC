@@ -27,19 +27,19 @@ public class MainController {
 
             switch (i) {
                 case "1":
-                    new BaseRepositoryController<>(Companies.class, RepositoryCreator.of(Companies.class),scanner).general();
+                    new BaseRepositoryController<>(Companies.class, scanner).general();
                     break;
                 case "2":
-                    new BaseRepositoryController<>(Customers.class, RepositoryCreator.of(Customers.class),scanner).general();
+                    new BaseRepositoryController<>(Customers.class,scanner).general();
                     break;
                 case "3":
-                    new BaseRepositoryController<>(Developers.class, RepositoryCreator.of(Developers.class),scanner).general();
+                    new BaseRepositoryController<>(Developers.class,scanner).general();
                     break;
                 case "4":
-                    new BaseRepositoryController<>(Projects.class, RepositoryCreator.of(Projects.class),scanner).general();
+                    new BaseRepositoryController<>(Projects.class,scanner).general();
                     break;
                 case "5":
-                    new BaseRepositoryController<>(Skills.class, RepositoryCreator.of(Skills.class),scanner).general();
+                    new BaseRepositoryController<>(Skills.class,scanner).general();
                     break;
                 case "6":
                     new CustomRepositoryController().general(RepositoryCreator.of(), scanner);

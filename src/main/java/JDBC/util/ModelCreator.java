@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class ModelCreator<T extends BaseModel> {
+public class ModelCreator {
 
     private final static ObjectMapper MAPPER = new ObjectMapper();
 
-    public static <T extends BaseModel> BaseModel create(Class<T> modelClass, Scanner scanner) {
+    public static <T extends BaseModel> T create(Class<T> modelClass, Scanner scanner) {
 
         Map<String, String> nameToType = Arrays.stream(modelClass.getDeclaredFields())
                 .filter(a -> !Modifier.isStatic(a.getModifiers()))

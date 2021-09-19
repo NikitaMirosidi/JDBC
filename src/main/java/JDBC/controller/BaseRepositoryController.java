@@ -2,27 +2,27 @@ package JDBC.controller;
 
 import JDBC.model.*;
 import JDBC.repository.BaseRepository;
+import JDBC.repository.RepositoryCreator;
 import JDBC.util.ModelCreator;
 import JDBC.util.ModelCreatorUtil;
 import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import lombok.SneakyThrows;
 
-import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class BaseRepositoryController<V extends BaseModel> implements BaseController<BaseModel> {
+public class BaseRepositoryController<T extends BaseModel> implements BaseController<T> {
 
-    private final BaseRepository<BaseModel> REPOSITORY;
-    private final Class<V> MODEL_CLASS;
+    private final BaseRepository<T> REPOSITORY;
+    private final Class<T> MODEL_CLASS;
     private final Scanner SCANNER;
 
-    public BaseRepositoryController(Class<V> modelClass, BaseRepository repository, Scanner scanner) {
+    public BaseRepositoryController(Class<T> modelClass, Scanner scanner) {
         this.MODEL_CLASS = modelClass;
         this.SCANNER = scanner;
-        this.REPOSITORY = repository;
+        this.REPOSITORY = RepositoryCreator.of(modelClass);
     }
 
     @SneakyThrows
@@ -42,7 +42,7 @@ public class BaseRepositoryController<V extends BaseModel> implements BaseContro
                     "0 - возврат в предыдущее меню\n");
 
             String i = SCANNER.nextLine();
-            BaseModel model;
+            T model;
             int id;
 
             switch (i) {
@@ -54,7 +54,7 @@ public class BaseRepositoryController<V extends BaseModel> implements BaseContro
                 case "2":
 
                     id = ModelCreatorUtil.getInt("ID",SCANNER);
-                    Optional<BaseModel> opt = get(id);
+                    Optional<T> opt = get(id);
 
                     if(opt.isEmpty()) {
                         System.out.println("В базе отсутствует запись с таким ID.");
@@ -92,7 +92,7 @@ public class BaseRepositoryController<V extends BaseModel> implements BaseContro
 
     @SneakyThrows
     @Override
-    public void save(BaseModel model) {
+    public void save(T model) {
 
             try {
                 REPOSITORY.save(model);
@@ -112,20 +112,20 @@ public class BaseRepositoryController<V extends BaseModel> implements BaseContro
 
     @SneakyThrows
     @Override
-    public Optional<BaseModel> get(int id) {
+    public Optional<T> get(int id) {
 
         return REPOSITORY.getById(id);
     }
 
     @SneakyThrows
     @Override
-    public List<BaseModel> getAll() {
+    public List<T> getAll() {
         return REPOSITORY.getAll();
     }
 
     @SneakyThrows
     @Override
-    public void update(BaseModel model) {
+    public void update(T model) {
 
         if(get(model.getId()).isPresent()) {
 
