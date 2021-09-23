@@ -4,7 +4,7 @@ import JDBC.repository.CustomRepository;
 
 import java.util.Scanner;
 
-public class CustomRepositoryController {
+public class CustomController {
 
     public void general(CustomRepository repository, Scanner scanner) {
 

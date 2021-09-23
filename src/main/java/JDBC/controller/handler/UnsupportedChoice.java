@@ -2,9 +2,9 @@ package JDBC.controller.handler;
 
 import java.util.Scanner;
 
-public class UnsupportedChioce extends UserChoiceHandler {
+public class UnsupportedChoice extends UserChoiceHandler {
 
-    public UnsupportedChioce() {
+    public UnsupportedChoice() {
         super (null);
     }
 

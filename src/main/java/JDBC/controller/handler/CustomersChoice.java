@@ -1,6 +1,7 @@
 package JDBC.controller.handler;
 
-import JDBC.controller.BaseRepositoryController;
+import JDBC.controller.BaseControllerImpl;
+import JDBC.model.Companies;
 import JDBC.model.Customers;
 
 import java.util.Scanner;
@@ -13,7 +14,16 @@ public class CustomersChoice extends UserChoiceHandler {
 
     @Override
     protected void apply(Scanner scanner) {
-        new BaseRepositoryController<>(Customers.class,scanner).general();
+
+        String simpleName = Customers.class.getSimpleName();
+
+        if(!controllers.containsKey(simpleName)) {
+            controllers.put(simpleName,new BaseControllerImpl<>(Customers.class, scanner));
+            controllers.get(simpleName).general();
+        }
+        else {
+            controllers.get(simpleName).general();
+        }
     }
 
     @Override

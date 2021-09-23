@@ -1,28 +1,29 @@
 package JDBC.controller;
 
 import JDBC.model.*;
-import JDBC.repository.BaseRepository;
-import JDBC.repository.RepositoryCreator;
+import JDBC.service.BaseService;
+import JDBC.service.ServiceImpl;
 import JDBC.util.ModelCreator;
 import JDBC.util.ModelCreatorUtil;
-import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
+
 import lombok.SneakyThrows;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-public class BaseRepositoryController<T extends BaseModel> implements BaseController<T> {
 
-    private final BaseRepository<T> REPOSITORY;
+public class BaseControllerImpl<T extends BaseModel> implements BaseController<T> {
+
     private final Class<T> MODEL_CLASS;
     private final Scanner SCANNER;
+    private final BaseService<T> SERVICE;
 
-    public BaseRepositoryController(Class<T> modelClass, Scanner scanner) {
+    public BaseControllerImpl(Class<T> modelClass, Scanner scanner) {
+
         this.MODEL_CLASS = modelClass;
         this.SCANNER = scanner;
-        this.REPOSITORY = RepositoryCreator.of(modelClass);
+        this.SERVICE = new ServiceImpl<>(MODEL_CLASS, SCANNER);
     }
 
     @SneakyThrows
@@ -94,60 +95,34 @@ public class BaseRepositoryController<T extends BaseModel> implements BaseContro
     @Override
     public void save(T model) {
 
-            try {
-                REPOSITORY.save(model);
-                System.out.println("Сохранено.");
-            }
-            catch (MysqlDataTruncation ex) {
-                System.out.println("Дата указана неверно.");
-            }
-            catch (SQLIntegrityConstraintViolationException e) {
-                System.out.println("В базе уже есть запись с таким именем.");
-
-                if(MODEL_CLASS.getSimpleName().equals("Projects")) {
-                    System.out.println("Или указанный ID владельца/ID исполнителя отсутствует в базе.");
-                }
-            }
+        System.out.println(SERVICE.save(model));
     }
 
     @SneakyThrows
     @Override
     public Optional<T> get(int id) {
 
-        return REPOSITORY.getById(id);
+        return SERVICE.getById(id);
     }
 
     @SneakyThrows
     @Override
     public List<T> getAll() {
-        return REPOSITORY.getAll();
+
+        return SERVICE.getAll();
     }
 
     @SneakyThrows
     @Override
     public void update(T model) {
 
-        if(get(model.getId()).isPresent()) {
-
-            REPOSITORY.update(model);
-            System.out.println("Обновлено.");
-        }
-        else {
-            System.out.println("В базе отсутствует запись с таким ID.");
-        }
+        System.out.println(SERVICE.update(model));
     }
 
     @SneakyThrows
     @Override
     public void delete(int id) {
 
-        if(get(id).isPresent()) {
-
-            REPOSITORY.deleteById(id);
-            System.out.println("Удалено.");
-        }
-        else {
-            System.out.println("В базе отсутствует запись с таким ID.");
-        }
+        System.out.println(SERVICE.delete(id));
     }
 }

@@ -1,6 +1,6 @@
 package JDBC.controller.handler;
 
-import JDBC.controller.CustomRepositoryController;
+import JDBC.controller.CustomController;
 import JDBC.repository.RepositoryCreator;
 
 import java.util.Scanner;
@@ -13,7 +13,7 @@ public class CustomRepoChoice extends UserChoiceHandler {
 
     @Override
     protected void apply(Scanner scanner) {
-        new CustomRepositoryController().general(RepositoryCreator.of(), scanner);
+        new CustomController().general(RepositoryCreator.of(), scanner);
     }
 
     @Override

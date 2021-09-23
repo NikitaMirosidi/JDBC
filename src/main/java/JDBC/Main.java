@@ -1,7 +1,6 @@
 package JDBC;
 
 import JDBC.controller.MainController;
-
 import lombok.SneakyThrows;
 
 public class Main {
