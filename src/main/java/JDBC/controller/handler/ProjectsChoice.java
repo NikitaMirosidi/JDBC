@@ -1,7 +1,6 @@
 package JDBC.controller.handler;
 
 import JDBC.controller.BaseControllerImpl;
-import JDBC.model.Developers;
 import JDBC.model.Projects;
 
 import java.util.Scanner;
@@ -19,11 +18,8 @@ public class ProjectsChoice extends UserChoiceHandler {
 
         if(!controllers.containsKey(simpleName)) {
             controllers.put(simpleName,new BaseControllerImpl<>(Projects.class, scanner));
-            controllers.get(simpleName).general();
         }
-        else {
-            controllers.get(simpleName).general();
-        }
+        controllers.get(simpleName).general();
     }
 
     @Override

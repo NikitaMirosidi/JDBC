@@ -160,7 +160,7 @@ public class CustomRepository implements Closeable {
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("name"))
                 .age(resultSet.getInt("age"))
-                .gender(resultSet.getString("sex"))
+                .gender(resultSet.getString("gender"))
                 .email(resultSet.getString("email"))
                 .salary(resultSet.getInt("salary"))
                 .companyId(resultSet.getInt("company_id"))

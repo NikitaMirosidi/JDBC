@@ -1,11 +1,5 @@
 package JDBC.util;
 
-import JDBC.model.Companies;
-import JDBC.model.Customers;
-import JDBC.repository.RepositoryCreator;
-import lombok.SneakyThrows;
-
-import java.util.List;
 import java.util.Scanner;
 
 public class ModelCreatorUtil {
@@ -109,38 +103,5 @@ public class ModelCreatorUtil {
         }
 
         return correctDate;
-    }
-
-    @SneakyThrows
-    private static boolean isIdInBase(String fieldName, int id) {
-
-        boolean isInBase = false;
-
-        if(fieldName.toLowerCase().contains("company")) {
-
-            List<Companies> all = RepositoryCreator.of(Companies.class).getAll();
-
-            for (Companies company : all) {
-
-                if (company.getId() == id) {
-                    isInBase = true;
-                    break;
-                }
-            }
-        }
-
-        if(fieldName.toLowerCase().contains("customer")) {
-            List<Customers> all = RepositoryCreator.of(Customers.class).getAll();
-
-            for (Customers customer : all) {
-
-                if (customer.getId() == id) {
-                    isInBase = true;
-                    break;
-                }
-            }
-        }
-
-        return isInBase;
     }
 }

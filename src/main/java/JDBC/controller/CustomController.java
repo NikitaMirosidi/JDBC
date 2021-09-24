@@ -1,15 +1,23 @@
 package JDBC.controller;
 
-import JDBC.repository.CustomRepository;
+import JDBC.service.CustomService;
 
 import java.util.Scanner;
 
 public class CustomController {
 
-    public void general(CustomRepository repository, Scanner scanner) {
+    private final CustomService SERVICE;
+    private final Scanner SCANNER;
+
+    public CustomController(Scanner scanner) {
+        this.SERVICE = new CustomService();
+        this.SCANNER = scanner;
+    }
+
+    public void general() {
 
         boolean a = true;
-        StringBuilder builder = new StringBuilder();
+        String userAnswer;
 
         while (a) {
 
@@ -21,35 +29,35 @@ public class CustomController {
                     "5 - получить список проектов в формате: дата создания - название проекта - количество разработчиков на этом проекте\n" +
                     "0 - возврат в предыдущее меню\n");
 
-            String i = scanner.nextLine();
+            String i = SCANNER.nextLine();
 
             switch (i) {
                 case "1":
+
                     System.out.print("Укажите название проекта: ");
-                    builder.append(scanner.nextLine());
-                    System.out.println(repository.getProjectsDevsSalary(builder.toString()) + "$");
-                    builder.setLength(0);
+                    userAnswer = SCANNER.nextLine();
+                    System.out.println(SERVICE.getProjectsDevsSalary(userAnswer) + "$");
                     break;
                 case "2":
+
                     System.out.print("Укажите название проекта: ");
-                    builder.append(scanner.nextLine());
-                    System.out.println(repository.getDevsByProject(builder.toString()));
-                    builder.setLength(0);
+                    userAnswer = SCANNER.nextLine();
+                    System.out.println(SERVICE.getDevsByProject(userAnswer));
                     break;
                 case "3":
+
                     System.out.print("Укажите название языка: ");
-                    builder.append(scanner.nextLine());
-                    System.out.println(repository.getDevsByLanguage(builder.toString()));
-                    builder.setLength(0);
+                    userAnswer = SCANNER.nextLine();
+                    System.out.println(SERVICE.getDevsByLanguage(userAnswer));
                     break;
                 case "4":
+
                     System.out.print("Укажите название уровня: ");
-                    builder.append(scanner.nextLine());
-                    System.out.println(repository.getDevsByLevel(builder.toString()));
-                    builder.setLength(0);
+                    userAnswer = SCANNER.nextLine();
+                    System.out.println(SERVICE.getDevsByLevel(userAnswer));
                     break;
                 case "5":
-                    System.out.println(repository.getProjects());
+                    System.out.println(SERVICE.getProjects());
                     break;
                 case "0":
                     a = false;

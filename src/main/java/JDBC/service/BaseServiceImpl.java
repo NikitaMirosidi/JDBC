@@ -13,23 +13,21 @@ import javax.persistence.Entity;
 import java.lang.reflect.Field;
 
 import java.lang.reflect.Modifier;
-import java.sql.DataTruncation;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
+public class BaseServiceImpl<T extends BaseModel> implements BaseService<T> {
 
     private final BaseRepository<T> REPOSITORY;
     private final Class<T> MODEL_CLASS;
-    private final Scanner SCANNER;
     private final List<Field> RELATION_FIELDS;
     private final String SCHEME_NAME;
+    private final String TABLE_NAME;
+    private final Connection UTIL_CONNECTION;
 
-    public ServiceImpl(Class<T> modelClass, Scanner scanner) {
+    public BaseServiceImpl(Class<T> modelClass) {
         this.MODEL_CLASS = modelClass;
-        this.SCANNER = scanner;
         this.REPOSITORY = RepositoryCreator.of(modelClass);
         this.RELATION_FIELDS = Arrays.stream(MODEL_CLASS.getDeclaredFields())
                 .filter(a -> !Modifier.isStatic(a.getModifiers()))
@@ -38,6 +36,8 @@ public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
                 .peek(e -> e.setAccessible(true))
                 .collect(Collectors.toList());
         this.SCHEME_NAME = PropertiesLoader.getProperty("schemeName");
+        this.TABLE_NAME = MODEL_CLASS.getAnnotation(Entity.class).name();
+        this.UTIL_CONNECTION = DatabaseConnection.getInstance().getConnection();
     }
 
     @SneakyThrows
@@ -72,9 +72,11 @@ public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
     @SneakyThrows
     @Override
     public List<T> getAll() {
+
         return REPOSITORY.getAll();
     }
 
+    @SneakyThrows
     @Override
     public String update(T model) {
 
@@ -89,6 +91,7 @@ public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
             return answer;
         }
         else {
+            REPOSITORY.update(model);
             return "Обновлено.\n";
         }
     }
@@ -101,6 +104,7 @@ public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
             return "Запись с указанным ID отсутствует в базе.";
         }
         else {
+            relationEraser(id);
             REPOSITORY.deleteById(id);
             return "Удалено.";
         }
@@ -153,17 +157,13 @@ public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
     @SneakyThrows
     private boolean isPresent(T model, String fieldName) {
 
-        String tableName = MODEL_CLASS.getAnnotation(Entity.class).name();
         Field field = MODEL_CLASS.getDeclaredField(fieldName);
         field.setAccessible(true);
         String fieldValue = (String) field.get(model);
-        String sql = "SELECT * FROM " + SCHEME_NAME + "." + tableName
+        String sql = "SELECT * FROM " + SCHEME_NAME + "." + TABLE_NAME
                 + " WHERE name = '" + fieldValue + "'";
 
-        return DatabaseConnection
-                .getInstance()
-                .getConnection()
-                .createStatement()
+        return UTIL_CONNECTION.createStatement()
                 .executeQuery(sql)
                 .next();
     }
@@ -185,5 +185,64 @@ public class ServiceImpl<T extends BaseModel> extends BaseService<T>{
         }
 
         return answer;
+    }
+
+    @SneakyThrows
+    private void relationEraser(int id) {
+
+        List<String> tableNames = new ArrayList<>();
+
+        switch (MODEL_CLASS.getSimpleName().toLowerCase()) {
+
+            case "companies":
+
+                tableNames.add("developers");
+                tableNames.add("projects");
+
+                eraseExecutor("update", "company_id", tableNames,id);
+                break;
+            case "customers":
+
+                tableNames.add("projects");
+
+                eraseExecutor("update", "customer_id", tableNames,id);
+                break;
+            case "developers":
+
+                tableNames.add("dev_and_projects");
+                tableNames.add("dev_and_skills");
+
+                eraseExecutor("delete", "developer_id", tableNames,id);
+                break;
+            case "projects":
+
+                tableNames.add("dev_and_projects");
+                eraseExecutor("delete", "project_id", tableNames,id);
+                break;
+            case "skills":
+
+                tableNames.add("dev_and_skills");
+                eraseExecutor("delete", "skill_id", tableNames,id);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @SneakyThrows
+    private void eraseExecutor(String deleteOrUpdate, String columnName, List<String> tableNames, int id) {
+
+        if(deleteOrUpdate.equals("update")) {
+            for(String tableName : tableNames) {
+                String sql = "UPDATE " + SCHEME_NAME + "." + tableName + " SET " + columnName + " = null WHERE " + columnName + " = " + id;
+                UTIL_CONNECTION.createStatement().executeUpdate(sql);
+            }
+        }
+        if(deleteOrUpdate.equals("delete")) {
+            for(String tableName : tableNames) {
+                String sql = "DELETE FROM " + SCHEME_NAME + "." + tableName + " WHERE " + columnName + " = " + id;
+                UTIL_CONNECTION.createStatement().executeUpdate(sql);
+            }
+        }
     }
 }

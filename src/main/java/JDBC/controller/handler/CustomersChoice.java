@@ -19,11 +19,8 @@ public class CustomersChoice extends UserChoiceHandler {
 
         if(!controllers.containsKey(simpleName)) {
             controllers.put(simpleName,new BaseControllerImpl<>(Customers.class, scanner));
-            controllers.get(simpleName).general();
         }
-        else {
-            controllers.get(simpleName).general();
-        }
+        controllers.get(simpleName).general();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package JDBC.controller.handler;
 
 import JDBC.controller.BaseController;
+import JDBC.controller.CustomController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 public abstract class UserChoiceHandler {
 
     protected Map<String,BaseController> controllers = new HashMap<>();
+    protected CustomController customController;
     private final UserChoiceHandler HANDLER;
 
     public UserChoiceHandler(UserChoiceHandler handler) {

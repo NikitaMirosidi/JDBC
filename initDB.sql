@@ -18,7 +18,7 @@ create table developers (
     gender varchar(45) not null,
     email varchar(45) not null,
     salary int not null,
-    company_id int not null,
+    company_id int,
 	primary key (id),
 	unique key (email),
 	foreign key (company_id) references companies (id));
@@ -27,8 +27,8 @@ create table projects (
     `name` varchar(45) not null,
     cost varchar(45) not null,
     creation_date date not null,
-    customer_id int not null,
-    company_id int not null,
+    customer_id int,
+    company_id int,
     primary key (id),
     unique key (`name`),
     foreign key (customer_id) references customers (id),
@@ -48,3 +48,7 @@ create table dev_and_skills (
     skill_id int not null,
     foreign key (developer_id) references developers (id),
     foreign key (skill_id) references skills (id));
+
+alter table developers change column company_id company_id int;
+alter table projects change column company_id company_id int;
+alter table projects change column customer_id customer_id int;

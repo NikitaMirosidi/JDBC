@@ -18,11 +18,8 @@ public class CompaniesChoice extends UserChoiceHandler {
 
         if(!controllers.containsKey(simpleName)) {
             controllers.put(simpleName,new BaseControllerImpl<>(Companies.class, scanner));
-            controllers.get(simpleName).general();
         }
-        else {
-            controllers.get(simpleName).general();
-        }
+        controllers.get(simpleName).general();
     }
 
     @Override

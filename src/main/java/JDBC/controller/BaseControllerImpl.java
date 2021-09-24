@@ -2,7 +2,7 @@ package JDBC.controller;
 
 import JDBC.model.*;
 import JDBC.service.BaseService;
-import JDBC.service.ServiceImpl;
+import JDBC.service.BaseServiceImpl;
 import JDBC.util.ModelCreator;
 import JDBC.util.ModelCreatorUtil;
 
@@ -23,7 +23,7 @@ public class BaseControllerImpl<T extends BaseModel> implements BaseController<T
 
         this.MODEL_CLASS = modelClass;
         this.SCANNER = scanner;
-        this.SERVICE = new ServiceImpl<>(MODEL_CLASS, SCANNER);
+        this.SERVICE = new BaseServiceImpl<>(MODEL_CLASS);
     }
 
     @SneakyThrows
